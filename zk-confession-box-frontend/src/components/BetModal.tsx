@@ -11,54 +11,99 @@ export const BetModal: React.FC<BetModalProps> = ({ confessionId, onClose, onCon
     const [amount, setAmount] = useState(1);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <div className="w-full max-w-md bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-2xl">
-                <h2 className="text-xl font-bold text-zinc-100 mb-2">Place Your Bet</h2>
-                <p className="text-sm text-zinc-500 mb-6">Bet XLM on whether this confession is actual truth or a fabrication.</p>
+        <div className="vault-overlay" onClick={onClose}>
+            <div className="vault-modal" onClick={(e) => e.stopPropagation()}>
+                <div style={{ marginBottom: '1.5rem' }}>
+                    <h2 className="heading-section" style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>
+                        Place Your Wager
+                    </h2>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                        Stake XLM on whether Entry #{confessionId} is authentic or a fabrication.
+                    </p>
+                </div>
 
-                <div className="flex bg-zinc-900 rounded-xl p-1 mb-6">
+                {/* Toggle */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '2rem' }}>
                     <button
                         onClick={() => setIsReal(true)}
-                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${isReal ? 'bg-purple-600 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'
-                            }`}
+                        style={{
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '0.7rem',
+                            fontWeight: 700,
+                            letterSpacing: '0.12em',
+                            textTransform: 'uppercase' as const,
+                            padding: '0.75rem',
+                            border: `1px solid ${isReal ? 'var(--teal)' : 'var(--vault-border)'}`,
+                            borderRadius: '2px',
+                            background: isReal ? 'var(--teal-dim)' : 'transparent',
+                            color: isReal ? 'var(--teal)' : 'var(--text-secondary)',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                        }}
                     >
-                        REAL
+                        Authentic
                     </button>
                     <button
                         onClick={() => setIsReal(false)}
-                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${!isReal ? 'bg-red-600 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300'
-                            }`}
+                        style={{
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '0.7rem',
+                            fontWeight: 700,
+                            letterSpacing: '0.12em',
+                            textTransform: 'uppercase' as const,
+                            padding: '0.75rem',
+                            border: `1px solid ${!isReal ? 'var(--sienna)' : 'var(--vault-border)'}`,
+                            borderRadius: '2px',
+                            background: !isReal ? 'var(--sienna-dim)' : 'transparent',
+                            color: !isReal ? 'var(--sienna)' : 'var(--text-secondary)',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                        }}
                     >
-                        FAKE
+                        Fabricated
                     </button>
                 </div>
 
-                <div className="mb-8">
-                    <label className="block text-xs font-semibold text-zinc-500 uppercase mb-2">Amount (XLM)</label>
-                    <div className="relative">
+                {/* Amount */}
+                <div style={{ marginBottom: '2rem' }}>
+                    <label className="text-label" style={{ display: 'block', marginBottom: '0.5rem' }}>
+                        Wager Amount (XLM)
+                    </label>
+                    <div style={{ position: 'relative' }}>
                         <input
                             type="number"
                             min="1"
                             value={amount}
                             onChange={(e) => setAmount(Number(e.target.value))}
-                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-3 px-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-purple-600 transition-all font-mono"
+                            className="vault-input"
+                            style={{ width: '100%', paddingRight: '3.5rem' }}
                         />
-                        <span className="absolute right-4 top-3.5 text-zinc-500 font-bold">XLM</span>
+                        <span style={{
+                            position: 'absolute',
+                            right: '1rem',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: '0.7rem',
+                            fontWeight: 600,
+                            color: 'var(--text-muted)',
+                        }}>
+                            XLM
+                        </span>
                     </div>
                 </div>
 
-                <div className="flex space-x-3">
-                    <button
-                        onClick={onClose}
-                        className="flex-1 py-3 text-sm font-semibold text-zinc-400 hover:text-zinc-200 transition-colors"
-                    >
+                {/* Actions */}
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                    <button onClick={onClose} className="btn-secondary" style={{ flex: 1 }}>
                         Cancel
                     </button>
                     <button
                         onClick={() => onConfirm(isReal, amount)}
-                        className="flex-1 py-3 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded-xl shadow-lg transition-all active:scale-95"
+                        className="btn-primary"
+                        style={{ flex: 1 }}
                     >
-                        Confirm Bet
+                        Confirm Wager
                     </button>
                 </div>
             </div>

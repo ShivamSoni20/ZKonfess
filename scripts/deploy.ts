@@ -60,7 +60,7 @@ const Keypair = await loadKeypairFactory();
 const NETWORK = 'testnet';
 const RPC_URL = 'https://soroban-testnet.stellar.org';
 const NETWORK_PASSPHRASE = 'Test SDF Network ; September 2015';
-const EXISTING_GAME_HUB_TESTNET_CONTRACT_ID = 'CB4VZAT2U3UC6XFK3N23SKRF2NDCMP3QHJYMCHHFMZO7MRQO6DQ2EMYG';
+const EXISTING_GAME_HUB_TESTNET_CONTRACT_ID = ''; // Removed hardcoded ID to force redeploy
 
 async function testnetAccountExists(address: string): Promise<boolean> {
   const res = await fetch(`https://horizon-testnet.stellar.org/accounts/${address}`, { method: 'GET' });
@@ -299,12 +299,22 @@ for (const contract of contracts) {
     const wasmHash = installResult.trim();
     console.log(`  WASM hash: ${wasmHash}`);
 
-    console.log("  Deploying and initializing...");
+    console.log("  Deploying...");
     const deployResult =
-      await $`stellar contract deploy --wasm-hash ${wasmHash} --source-account ${adminSecret} --network ${NETWORK} -- --admin ${adminAddress} --game-hub ${mockGameHubId}`.text();
+      await $`stellar contract deploy --wasm-hash ${wasmHash} --source-account ${adminSecret} --network ${NETWORK}`.text();
     const contractId = deployResult.trim();
     deployed[contract.packageName] = contractId;
     console.log(`✅ ${contract.packageName} deployed: ${contractId}\n`);
+
+    console.log("  Initializing...");
+    try {
+      if (contract.packageName === "twenty-one" || contract.packageName === "number-guess" || contract.packageName === "zk-confession-box") {
+        await $`stellar contract invoke --id ${contractId} --network ${NETWORK} --source-account ${adminSecret} -- initialize --admin ${adminAddress} --game_hub ${mockGameHubId}`;
+        console.log(`✅ ${contract.packageName} initialized\n`);
+      }
+    } catch (e) {
+      console.warn(`⚠️ Warning: Initialization failed or not needed for ${contract.packageName}`);
+    }
   } catch (error) {
     console.error(`❌ Failed to deploy ${contract.packageName}:`, error);
     process.exit(1);

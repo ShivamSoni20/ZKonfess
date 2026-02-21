@@ -7,7 +7,7 @@ import { useWallet } from '../hooks/useWallet';
 export const Feed: React.FC = () => {
     const [confessions, setConfessions] = useState<Confession[]>([]);
     const [loading, setLoading] = useState(true);
-    const { publicKey } = useWallet();
+    const { publicKey, getContractSigner } = useWallet();
     const { myConfessions } = usePlayer();
 
     const loadConfessions = async () => {
@@ -28,9 +28,9 @@ export const Feed: React.FC = () => {
 
     const handleVote = async (id: string, type: VoteType) => {
         if (!publicKey) return alert('Please connect wallet');
+        const signer = getContractSigner();
         try {
-            await stellarService.vote({ publicKey }, id, type);
-            // Optimistic update
+            await stellarService.vote({ publicKey, signer }, id, type);
             setConfessions(prev => prev.map(c =>
                 c.id === id ? {
                     ...c,
@@ -47,8 +47,9 @@ export const Feed: React.FC = () => {
 
     const handleBet = async (id: string, isReal: boolean, amount: number) => {
         if (!publicKey) return alert('Please connect wallet');
+        const signer = getContractSigner();
         try {
-            await stellarService.placeBet({ publicKey }, id, isReal, amount);
+            await stellarService.placeBet({ publicKey, signer }, id, isReal, amount);
             alert('Bet placed successfully!');
         } catch (e) {
             console.error(e);
@@ -57,32 +58,33 @@ export const Feed: React.FC = () => {
     };
 
     return (
-        <div className="max-w-2xl mx-auto py-8 px-4">
-            <header className="mb-10 text-center">
-                <h1 className="text-4xl font-extrabold text-white mb-2 tracking-tight">The Confession Box</h1>
-                <p className="text-zinc-500 font-mono text-sm uppercase tracking-widest">Anonymous truths. Zero knowledge.</p>
+        <div className="page-container">
+            <header className="page-header stagger-enter stagger-1">
+                <h1>The Confession Box</h1>
+                <p>Anonymous truths · sealed with zero knowledge</p>
             </header>
 
             {loading ? (
-                <div className="flex flex-col items-center justify-center py-20 space-y-4">
-                    <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-zinc-500 font-mono text-xs">Fetching secrets from the ledger...</p>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '5rem 0', gap: '1rem' }}>
+                    <div className="vault-spinner" />
+                    <span className="text-label">Retrieving sealed confessions...</span>
                 </div>
             ) : (
-                <div className="space-y-6">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     {confessions.length === 0 ? (
-                        <div className="text-center py-20 bg-zinc-950 border border-zinc-900 rounded-3xl">
-                            <p className="text-zinc-600 font-mono">Silence is golden. Be the first to speak.</p>
+                        <div className="empty-state stagger-enter stagger-2">
+                            <p>"In the silence before the first confession,<br />even the walls hold their breath."</p>
                         </div>
                     ) : (
-                        confessions.map((c) => (
-                            <ConfessionCard
-                                key={c.id}
-                                confession={c}
-                                onVote={(type) => handleVote(c.id, type)}
-                                onBet={(isReal, amount) => handleBet(c.id, isReal, amount)}
-                                isOwner={myConfessions.includes(c.id)}
-                            />
+                        confessions.map((c, i) => (
+                            <div key={c.id} className={`stagger-enter stagger-${Math.min(i + 2, 8)}`}>
+                                <ConfessionCard
+                                    confession={c}
+                                    onVote={(type) => handleVote(c.id, type)}
+                                    onBet={(isReal, amount) => handleBet(c.id, isReal, amount)}
+                                    isOwner={myConfessions.includes(c.id)}
+                                />
+                            </div>
                         ))
                     )}
                 </div>

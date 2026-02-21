@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { zkService } from '../services/zk';
-import { stellarService } from '../services/stellar';
+import { stellarService, Wallet } from '../services/stellar';
 import { usePlayer } from '../context/PlayerContext';
 import { useWallet } from '../hooks/useWallet';
 
@@ -9,54 +9,48 @@ export const Submit: React.FC = () => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [status, setStatus] = useState('');
     const { playerSecret, registerIfNeeded, addConfession } = usePlayer();
-    const { publicKey } = useWallet();
+    const { publicKey, getContractSigner } = useWallet();
 
     const handleSubmit = async () => {
         if (!content.trim()) return;
         if (!publicKey) return alert('Please connect wallet');
 
+        const signer = getContractSigner();
+        const wallet: Wallet = { publicKey, signer };
+
         setIsGenerating(true);
-        setStatus('🔐 INITIALIZING ZK CIRCUIT...');
+        setStatus('Initializing ZK circuit...');
 
         try {
-            // 1. Ensure registered
-            await registerIfNeeded({ publicKey });
+            const secret = await registerIfNeeded(wallet);
 
-            // 2. Prepare inputs
-            setStatus('⏳ HASHING CONTENT...');
+            setStatus('Hashing confession content...');
             const contentHash = await zkService.hashContent(content);
-            const dateSalt = Math.floor(Date.now() / 86400000);
+            const dateSalt = Date.now(); // Changed for easier testing (allows multiple submissions per day)
 
-            // 3. Generate Proof
-            setStatus('🛡️ GENERATING ZERO-KNOWLEDGE PROOF...');
-            // Note: In a real worker implementation, this would be a message send/wait
-            // For MVP we call the service directly which might block UI (ideal: Worker)
-            const secret = playerSecret || zkService.generatePlayerSecret();
+            setStatus('Generating zero-knowledge proof...');
             const { proof, nullifier, commitment } = await zkService.generateSubmissionProof(
                 secret,
                 dateSalt,
                 contentHash
             );
 
-            // 4. Submit to Stellar
-            setStatus('🚀 SUBMITTING SEALED CONFESSION TO STELLAR...');
+            setStatus('Submitting sealed confession to Stellar...');
             const confessionId = await stellarService.submitConfession(
-                { publicKey },
+                wallet,
                 contentHash,
                 nullifier,
                 commitment,
                 proof
             );
 
-            // 5. Track ownership locally
             addConfession(confessionId.toString());
-
             setContent('');
-            setStatus('✅ CONFESSION SUBMITTED ANONYMOUSLY');
-            alert(`Confession #${confessionId} submitted! Your secret is stored in memory for this session.`);
+            setStatus('Confession sealed successfully.');
+            alert(`Confession #${confessionId} submitted. Your secret is stored in memory for this session.`);
         } catch (e) {
             console.error(e);
-            setStatus('❌ SUBMISSION FAILED');
+            setStatus('Submission failed.');
             alert('Error during submission. Check console.');
         } finally {
             setIsGenerating(false);
@@ -64,48 +58,69 @@ export const Submit: React.FC = () => {
     };
 
     return (
-        <div className="max-w-xl mx-auto py-12 px-4">
-            <div className="bg-zinc-950 border border-zinc-900 rounded-3xl p-8 shadow-2xl">
-                <h2 className="text-2xl font-bold text-white mb-2">Seal a Secret</h2>
-                <p className="text-zinc-500 text-sm mb-8">Your identity stays private. Only the proof of your knowledge is shared.</p>
+        <div className="page-container">
+            <header className="page-header stagger-enter stagger-1">
+                <h1>Seal a Secret</h1>
+                <p>Your identity stays private · only proof is shared</p>
+            </header>
 
-                <div className="relative mb-8">
+            <div className="dossier-card stagger-enter stagger-2">
+                {/* Classification header */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <span className="text-label">Classified Entry</span>
+                    <span className="text-label" style={{ color: 'var(--amber-dim)' }}>
+                        {content.length}/280
+                    </span>
+                </div>
+
+                {/* Textarea */}
+                <div style={{ position: 'relative', marginBottom: '2rem' }}>
                     <textarea
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        placeholder="What is your confession?"
+                        placeholder="Speak your truth here..."
                         maxLength={280}
                         disabled={isGenerating}
-                        className="w-full h-48 bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 text-zinc-100 placeholder-zinc-700 focus:outline-none focus:ring-2 focus:ring-purple-600 transition-all font-mono resize-none"
+                        className="vault-textarea"
                     />
-                    <div className="absolute bottom-4 right-4 text-[10px] font-mono text-zinc-600">
-                        {content.length}/280
-                    </div>
                 </div>
 
+                {/* Status indicator */}
+                {isGenerating && (
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
+                        padding: '1rem',
+                        marginBottom: '1.5rem',
+                        background: 'var(--amber-glow)',
+                        border: '1px solid var(--vault-border)',
+                        borderRadius: '2px',
+                    }}>
+                        <div className="vault-spinner" />
+                        <span className="text-mono" style={{ fontSize: '0.7rem', color: 'var(--amber)', letterSpacing: '0.05em' }}>
+                            {status}
+                        </span>
+                    </div>
+                )}
+
+                {/* Submit button */}
                 <button
                     onClick={handleSubmit}
                     disabled={isGenerating || !content.trim()}
-                    className={`w-full py-4 rounded-xl font-bold text-sm transition-all shadow-lg active:scale-95 flex items-center justify-center space-x-2 ${isGenerating
-                            ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
-                            : 'bg-purple-600 hover:bg-purple-500 text-white'
-                        }`}
+                    className="btn-primary"
+                    style={{ width: '100%' }}
                 >
-                    {isGenerating ? (
-                        <>
-                            <div className="w-4 h-4 border-2 border-zinc-500 border-t-transparent rounded-full animate-spin"></div>
-                            <span>{status}</span>
-                        </>
-                    ) : (
-                        <>
-                            <span>SUBMIT ANONYMOUSLY</span>
-                            <span>🔒</span>
-                        </>
-                    )}
+                    {isGenerating ? 'Sealing...' : 'Seal & Submit Anonymously'}
                 </button>
 
-                <div className="mt-8 p-4 bg-zinc-900/30 rounded-xl border border-zinc-800/50 italic text-[11px] text-zinc-500 leading-relaxed">
-                    <span className="text-zinc-400 font-bold not-italic">Warning:</span> Your player secret is held only in memory. If you refresh or close this tab, you will lose the ability to prove you are the author of this confession.
+                {/* Divider */}
+                <div className="divider" />
+
+                {/* Warning */}
+                <div className="warning-box">
+                    <strong>Ephemeral Secret:</strong> Your player secret exists only in this browser tab's memory.
+                    Closing or refreshing will permanently destroy your ability to prove authorship.
                 </div>
             </div>
         </div>

@@ -1,0 +1,67 @@
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   /mnt/d/Gihtub Main/Steller/contracts/mock-game-hub/Cargo.toml
+workspace: /mnt/d/Gihtub Main/Steller/Cargo.toml
+warning: /mnt/d/Gihtub Main/Steller/Cargo.toml: unused manifest key: workspace.version
+   Compiling zk-confession-box v0.1.0 (/mnt/d/Gihtub Main/Steller/contracts/zk-confession-box)
+error[E0382]: borrow of moved value: `player`
+   --> contracts/zk-confession-box/src/lib.rs:182:17
+    |
+125 | ...   player: Address,
+    |       ------ move occurs because `player` has type `soroban_sdk::Address`, which does not implement the `Copy` trait
+...
+172 | ...   env.storage().persistent().set(&DataKey::Player(player), ...
+    |                                                       ------ value moved here
+...
+182 | ...           &player,
+    |               ^^^^^^^ value borrowed here after move
+    |
+help: consider cloning the value if the performance cost is acceptable
+    |
+172 |         env.storage().persistent().set(&DataKey::Player(player.clone()), &profile);
+    |                                                               ++++++++
+
+warning: variable `winner_id` is assigned to, but never used
+   --> contracts/zk-confession-box/src/lib.rs:255:13
+    |
+255 | ...   let mut winner_id = 0u64;
+    |           ^^^^^^^^^^^^^
+    |
+    = note: consider using `_winner_id` instead
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: value assigned to `winner_id` is never read
+   --> contracts/zk-confession-box/src/lib.rs:264:21
+    |
+264 | ...   winner_id = i; 
+    |       ^^^^^^^^^^^^^
+    |
+    = help: maybe it is overwritten before being read?
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `env`
+   --> contracts/zk-confession-box/src/lib.rs:326:21
+    |
+326 | ...fy_proof(env: &Env, vk: &...
+    |             ^^^ help: if this is intentional, prefix it with an underscore: `_env`
+
+warning: unused variable: `vk`
+   --> contracts/zk-confession-box/src/lib.rs:326:32
+    |
+326 | ...v: &Env, vk: &Bytes, proo...
+    |             ^^ help: if this is intentional, prefix it with an underscore: `_vk`
+
+warning: unused variable: `public_inputs`
+   --> contracts/zk-confession-box/src/lib.rs:326:59
+    |
+326 | ...tes, public_inputs: &Vec<...
+    |         ^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_public_inputs`
+
+warning: unused variable: `env`
+   --> contracts/zk-confession-box/src/lib.rs:332:31
+    |
+332 | ..._element(env: &Env, bytes...
+    |             ^^^ help: if this is intentional, prefix it with an underscore: `_env`
+
+For more information about this error, try `rustc --explain E0382`.
+warning: `zk-confession-box` (lib) generated 6 warnings
+error: could not compile `zk-confession-box` (lib) due to 1 previous error; 6 warnings emitted

@@ -7,7 +7,7 @@ interface PlayerContextType {
     isRegistered: boolean;
     myConfessions: string[];
     isLoading: boolean;
-    registerIfNeeded: (wallet: any) => Promise<void>;
+    registerIfNeeded: (wallet: { publicKey: string, signer: any }) => Promise<string>;
     addConfession: (id: string) => void;
     resetPlayer: () => void;
 }
@@ -42,26 +42,28 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         // setMyConfessions([]);
     };
 
-    const registerIfNeeded = async (wallet: any) => {
-        if (!wallet?.publicKey || isRegistered) return;
+    const registerIfNeeded = async (wallet: { publicKey: string, signer: any }): Promise<string> => {
+        // 1. Generate or get secret
+        let secret = playerSecret;
+        if (!secret) {
+            secret = zkService.generatePlayerSecret();
+            setPlayerSecret(secret);
+        }
+
+        if (!wallet?.publicKey || isRegistered) return secret;
 
         setIsLoading(true);
         try {
-            // 1. Generate or get secret
-            let secret = playerSecret;
-            if (!secret) {
-                secret = zkService.generatePlayerSecret();
-                setPlayerSecret(secret);
-            }
-
             // 2. Generate identity commitment
             const commitment = await zkService.generateIdentityCommitment(secret);
 
             // 3. Register on-chain
             await stellarService.registerPlayer(wallet, commitment);
             setIsRegistered(true);
+            return secret;
         } catch (error) {
             console.error('Registration failed:', error);
+            throw error;
         } finally {
             setIsLoading(false);
         }
