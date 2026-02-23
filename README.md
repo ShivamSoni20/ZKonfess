@@ -105,4 +105,4 @@ Contributions are welcome. Please refer to our `CONTRIBUTING.md` for standards r
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
-**Build with ❤️ for the Stellar Meridian Ecosystem hackathon.**
+**Built with ❤️ by Shivam Soni for the Stellar ZK Gaming Hackathon 2026..**
