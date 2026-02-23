@@ -14,52 +14,81 @@ const TAB_LABELS: Record<Tab, string> = {
 };
 
 function ConnectModal({ onClose }: { onClose: () => void }) {
-  const { connectDev, isConnecting, isDevPlayerAvailable } = useWallet();
+  const { connect, isConnecting, error } = useWallet();
 
-  const handleConnect = async (player: 1 | 2) => {
+  const handleConnect = async () => {
     try {
-      await connectDev(player);
+      await connect();
       onClose();
     } catch (err) {
-      console.error('Connection failed:', err);
+      // Error is caught and stored in state by useWallet
     }
   };
+
+  const isWrongNetwork = error === 'WRONG_NETWORK';
+  const isNotInstalled = error === 'FREIGHTER_NOT_INSTALLED';
 
   return (
     <div className="vault-overlay" onClick={onClose}>
       <div className="vault-modal" onClick={(e) => e.stopPropagation()}>
         <div style={{ marginBottom: '1.5rem' }}>
           <h2 className="heading-section" style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>
-            Enter The Vault
+            Secure Connection
           </h2>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-            Choose an identity to connect with. Dev wallets are pre-funded on the Stellar Testnet.
+            Connect your Freighter wallet to interact with the ZK Confession Box.
           </p>
         </div>
 
         <div className="connect-modal-grid">
           <button
-            onClick={() => handleConnect(1)}
-            disabled={isConnecting || !isDevPlayerAvailable(1)}
+            onClick={handleConnect}
+            disabled={isConnecting}
             className="connect-option"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '2rem 1rem'
+            }}
           >
-            <span>Player 1 — Testnet Wallet</span>
-            <span className="option-badge">Dev</span>
-          </button>
-          <button
-            onClick={() => handleConnect(2)}
-            disabled={isConnecting || !isDevPlayerAvailable(2)}
-            className="connect-option"
-          >
-            <span>Player 2 — Testnet Wallet</span>
-            <span className="option-badge">Dev</span>
+            <div className="wallet-icon-placeholder" style={{
+              width: '40px',
+              height: '40px',
+              background: 'var(--amber-glow)',
+              borderRadius: '50%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              fontSize: '1.2rem'
+            }}>
+              ⚓
+            </div>
+            <span style={{ fontWeight: 600 }}>Connect Freighter</span>
+            <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>Stellar Network Extension</span>
           </button>
         </div>
 
-        {isConnecting && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '1.5rem' }}>
-            <div className="vault-spinner" />
-            <span className="text-label">Authenticating...</span>
+        {(isConnecting || isWrongNetwork) && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', marginTop: '1.5rem' }}>
+            {isConnecting && <div className="vault-spinner" />}
+            <span className="text-label">
+              {isWrongNetwork ? '⚠️ Switch to Testnet' : 'Awaiting approval...'}
+            </span>
+          </div>
+        )}
+
+        {error && (
+          <div className="warning-box" style={{ marginTop: '1.5rem', marginBottom: '1rem', fontSize: '0.7rem' }}>
+            <strong>
+              {isWrongNetwork ? 'Wrong Network:' : 'Status:'}
+            </strong>
+            {isNotInstalled
+              ? ' Freighter wallet extension not detected.'
+              : isWrongNetwork
+                ? ' Freighter must be set to TESTNET.'
+                : ` ${error}`}
           </div>
         )}
 
@@ -76,17 +105,32 @@ function ConnectModal({ onClose }: { onClose: () => void }) {
 function AppContent() {
   const [activeTab, setActiveTab] = useState<Tab>('feed');
   const [showConnect, setShowConnect] = useState(false);
-  const { publicKey, isConnected, disconnect, walletId } = useWallet();
+  const { publicKey, isConnected, disconnect, error } = useWallet();
 
   return (
     <div style={{ minHeight: '100vh' }}>
       <div className="vault-atmosphere" />
 
+      {/* Network Warning Banner */}
+      {error === 'WRONG_NETWORK' && (
+        <div style={{
+          background: 'var(--amber-glow)',
+          color: '#000',
+          textAlign: 'center',
+          padding: '0.5rem',
+          fontSize: '0.75rem',
+          fontWeight: 700,
+          letterSpacing: '0.05em'
+        }}>
+          ⚠️ WRONG NETWORK: PLEASE SWITCH FREIGHTER TO TESTNET
+        </div>
+      )}
+
       {/* Navigation */}
       <nav className="vault-nav">
         <div className="vault-nav-inner">
           <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
-            <span className="vault-logo">The Vault</span>
+            <span className="vault-logo">🤫 ZK Confession Box</span>
 
             <div className="vault-tabs desktop-tabs">
               {(Object.keys(TAB_LABELS) as Tab[]).map((tab) => (
@@ -103,12 +147,18 @@ function AppContent() {
 
           <div>
             {isConnected ? (
-              <div className="wallet-connected">
-                <div className="wallet-dot" />
-                <span className="wallet-address">
+              <div className="wallet-connected" style={{
+                background: 'rgba(139, 92, 246, 0.2)',
+                border: '1px solid var(--purple-neon)',
+                padding: '0.4rem 0.75rem',
+                borderRadius: '999px',
+                color: 'var(--purple-neon)'
+              }}>
+                <div className="wallet-dot" style={{ background: 'var(--purple-neon)' }} />
+                <span className="wallet-address" style={{ fontSize: '0.75rem', fontWeight: 600 }}>
                   {publicKey?.slice(0, 4)}···{publicKey?.slice(-4)}
                 </span>
-                <button onClick={disconnect} className="wallet-disconnect" title="Disconnect">
+                <button onClick={disconnect} className="wallet-disconnect" title="Disconnect" style={{ color: 'var(--purple-neon)' }}>
                   ✕
                 </button>
               </div>

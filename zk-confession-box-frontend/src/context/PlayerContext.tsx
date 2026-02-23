@@ -50,24 +50,33 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             setPlayerSecret(secret);
         }
 
-        if (!wallet?.publicKey || isRegistered) return secret;
+        if (!wallet?.publicKey) return secret;
+        if (isRegistered) return secret;
 
         setIsLoading(true);
         try {
-            // 2. Generate identity commitment
+            // 4. Generate identity commitment
+
             const commitment = await zkService.generateIdentityCommitment(secret);
 
-            // 3. Register on-chain
+            // 5. Register on-chain
+            console.log('Registering player on-chain...');
             await stellarService.registerPlayer(wallet, commitment);
+
+            // 6. Safety delay: Wait for sequence number to propagate in RPC
+            console.log('Registration successful, waiting 5s for sequence propagation...');
+            await new Promise(resolve => setTimeout(resolve, 5000));
+
             setIsRegistered(true);
             return secret;
         } catch (error) {
-            console.error('Registration failed:', error);
+            console.error('Registration/Check failed:', error);
             throw error;
         } finally {
             setIsLoading(false);
         }
     };
+
 
     return (
         <PlayerContext.Provider value={{

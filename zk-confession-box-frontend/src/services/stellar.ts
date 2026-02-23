@@ -147,33 +147,46 @@ class StellarService {
 
     async fetchConfessions(limit: number = 20, offset: number = 0): Promise<Confession[]> {
         const client = getClient();
-        const tx = await client.get_confessions({ limit: BigInt(limit), offset: BigInt(offset) });
-        const raw = tx.result as unknown as ContractConfession[];
-        return (raw || []).map((c: any) => ({
-            id: c.id.toString(),
-            contentHash: c.content_hash?.toString('hex') || '',
-            commitment: c.commitment?.toString('hex') || '',
-            nullifier: c.nullifier?.toString('hex') || '',
-            votesRelatable: Number(c.votes_relatable || 0),
-            votesShocking: Number(c.votes_shocking || 0),
-            votesFake: Number(c.votes_fake || 0),
-            timestamp: Number(c.timestamp || 0),
-            revealed: c.revealed || false,
-            author: c.author?.toString(),
-        }));
+        try {
+            // Bindings can vary: sometimes they return the value directly,
+            // sometimes they return a transaction object with a result property.
+            const response = await client.get_confessions({ limit: BigInt(limit), offset: BigInt(offset) });
+            const raw = (response as any).result || response || [];
+
+            return (raw as any[]).map((c: any) => ({
+                id: c.id.toString(),
+                contentHash: c.content_hash?.toString('hex') || '',
+                commitment: c.commitment?.toString('hex') || '',
+                nullifier: c.nullifier?.toString('hex') || '',
+                votesRelatable: Number(c.votes_relatable || 0),
+                votesShocking: Number(c.votes_shocking || 0),
+                votesFake: Number(c.votes_fake || 0),
+                timestamp: Number(c.timestamp || 0),
+                revealed: c.revealed || false,
+                author: c.author?.toString(),
+            }));
+        } catch (e) {
+            console.error('[Stellar] fetchConfessions error:', e);
+            return [];
+        }
     }
 
     async fetchBets(confessionId: string): Promise<Bet[]> {
         const client = getClient();
-        const tx = await client.get_bets({ confession_id: BigInt(confessionId) });
-        const raw = tx.result as unknown as ContractBet[];
-        return (raw || []).map((b: any) => ({
-            bettor: b.bettor?.toString() || '',
-            confessionId: b.confession_id.toString(),
-            betReal: b.bet_real,
-            amount: Number(b.amount || 0) / 10_000_000,
-            settled: b.settled || false,
-        }));
+        try {
+            const response = await client.get_bets({ confession_id: BigInt(confessionId) });
+            const raw = (response as any).result || response || [];
+            return (raw as any[]).map((b: any) => ({
+                bettor: b.bettor?.toString() || '',
+                confessionId: b.confession_id.toString(),
+                betReal: b.bet_real,
+                amount: Number(b.amount || 0) / 10_000_000,
+                settled: b.settled || false,
+            }));
+        } catch (e) {
+            console.error('[Stellar] fetchBets error:', e);
+            return [];
+        }
     }
 
     async addComment(wallet: Wallet, confessionId: string, text: string) {
@@ -189,14 +202,20 @@ class StellarService {
 
     async fetchComments(confessionId: string): Promise<Comment[]> {
         const client = getClient();
-        const tx = await client.get_comments({ confession_id: BigInt(confessionId) });
-        const raw = tx.result as any[];
-        return (raw || []).map((c: any) => ({
-            author: c.author?.toString() || '',
-            text: c.text?.toString() || '',
-            timestamp: Number(c.timestamp || 0),
-        }));
+        try {
+            const response = await client.get_comments({ confession_id: BigInt(confessionId) });
+            const raw = (response as any).result || response || [];
+            return (raw as any[]).map((c: any) => ({
+                author: c.author?.toString() || '',
+                text: c.text?.toString() || '',
+                timestamp: Number(c.timestamp || 0),
+            }));
+        } catch (e) {
+            console.error('[Stellar] fetchComments error:', e);
+            return [];
+        }
     }
 }
 
 export const stellarService = new StellarService();
+

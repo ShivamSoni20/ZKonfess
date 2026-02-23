@@ -60,15 +60,6 @@ export const TWENTY_ONE_CONTRACT = getContractId('twenty-one');
 export const ZK_CONFESSION_BOX_CONTRACT = getContractId('zk-confession-box');
 export const DICE_DUEL_CONTRACT = getContractId('dice-duel');
 
-// Dev wallet addresses
-export const DEV_ADMIN_ADDRESS = import.meta.env.VITE_DEV_ADMIN_ADDRESS || '';
-export const DEV_PLAYER1_ADDRESS = import.meta.env.VITE_DEV_PLAYER1_ADDRESS || '';
-export const DEV_PLAYER2_ADDRESS = import.meta.env.VITE_DEV_PLAYER2_ADDRESS || '';
-
-// Runtime-configurable simulation source (for standalone builds)
-export const RUNTIME_SIMULATION_SOURCE =
-  runtimeConfig?.simulationSourceAddress || import.meta.env.VITE_SIMULATION_SOURCE_ADDRESS || '';
-
 // Transaction options
 export const DEFAULT_METHOD_OPTIONS = {
   timeoutInSeconds: 30,

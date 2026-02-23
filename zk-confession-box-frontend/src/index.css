@@ -21,17 +21,27 @@
   --violet-glow: rgba(139, 92, 246, 0.07);
   --violet-bright: #a78bfa;
   --violet-deep: #4c1d95;
+  --purple-neon: #8b5cf6;
+  --purple-light: rgba(139, 92, 246, 0.4);
 
   /* Spectral Teal — Verified/ZK States */
   --teal: #3d8c7e;
   --teal-dim: rgba(61, 140, 126, 0.2);
   --teal-glow: rgba(61, 140, 126, 0.08);
 
-  /* Burnt Rose (danger/fake) */
+  /* Burnt Rose / Sienna (danger/fake) */
   --rose: #c4556a;
   --rose-dim: rgba(196, 85, 106, 0.2);
+  --sienna: #a73b4d;
+  --sienna-dim: rgba(167, 59, 77, 0.15);
+
+  /* Warnings / Amber */
+  --amber: #ffbf00;
+  --amber-dim: rgba(255, 191, 0, 0.7);
+  --amber-glow: rgba(255, 191, 0, 0.1);
 
   /* Text — cool-toned parchment */
+
   --text-primary: #d4d0e0;
   --text-secondary: #706b82;
   --text-muted: #44405a;
@@ -696,6 +706,25 @@ body {
     transform: rotate(360deg);
   }
 }
+
+.progress-bar-indet {
+  width: 40%;
+  height: 100%;
+  background: var(--purple-neon);
+  box-shadow: 0 0 10px var(--purple-neon);
+  animation: indet-progress 1.5s ease-in-out infinite;
+}
+
+@keyframes indet-progress {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(250%);
+  }
+}
+
 
 /* ═══════════════════════════════════════════════
    UTILITY

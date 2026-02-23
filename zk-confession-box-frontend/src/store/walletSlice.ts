@@ -4,7 +4,7 @@ export interface WalletState {
   // Wallet connection
   publicKey: string | null;
   walletId: string | null; // ID of the connected wallet
-  walletType: 'dev' | 'wallet' | null; // Track if dev wallet or real wallet
+  walletType: 'dev' | 'wallet' | 'freighter' | null; // Track if dev wallet or real wallet
   isConnected: boolean;
   isConnecting: boolean;
 
@@ -16,7 +16,7 @@ export interface WalletState {
   error: string | null;
 
   // Actions
-  setWallet: (publicKey: string, walletId: string, walletType: 'dev' | 'wallet') => void;
+  setWallet: (publicKey: string, walletId: string, walletType: 'dev' | 'wallet' | 'freighter') => void;
   setPublicKey: (publicKey: string) => void;
   setConnected: (connected: boolean) => void;
   setConnecting: (connecting: boolean) => void;
@@ -67,7 +67,6 @@ export const useWalletStore = create<WalletState>()((set) => ({
   setConnecting: (connecting) =>
     set({
       isConnecting: connecting,
-      error: null,
     }),
 
   setNetwork: (network, networkPassphrase) =>

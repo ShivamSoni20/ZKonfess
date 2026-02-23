@@ -320,6 +320,8 @@ impl ZKConfessionBox {
     }
 }
 
+
+
 impl ZKConfessionBox {
     fn get_submit_verification_key(env: &Env) -> Bytes { Bytes::from_slice(env, &[0u8; 32]) }
     fn get_reveal_verification_key(env: &Env) -> Bytes { Bytes::from_slice(env, &[0u8; 32]) }

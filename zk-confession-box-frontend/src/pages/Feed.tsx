@@ -10,6 +10,8 @@ export const Feed: React.FC = () => {
     const { publicKey, getContractSigner } = useWallet();
     const { myConfessions } = usePlayer();
 
+    const [sortBy, setSortBy] = useState<'recent' | 'trending'>('recent');
+
     const loadConfessions = async () => {
         setLoading(true);
         try {
@@ -57,34 +59,76 @@ export const Feed: React.FC = () => {
         }
     };
 
+
+    const sortedConfessions = [...confessions].sort((a, b) => {
+        if (sortBy === 'trending') {
+            const votesA = a.votesRelatable + a.votesShocking + a.votesFake;
+            const votesB = b.votesRelatable + b.votesShocking + b.votesFake;
+            return votesB - votesA;
+        }
+        return b.timestamp - a.timestamp;
+    });
+
+    const currentDate = new Date().toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
     return (
         <div className="page-container">
-            <header className="page-header stagger-enter stagger-1">
-                <h1>The Confession Box</h1>
-                <p>Anonymous truths · sealed with zero knowledge</p>
+            <header className="page-header" style={{ marginBottom: '2.5rem' }}>
+                <h1 style={{ fontSize: '2rem', marginBottom: '0.25rem' }}>Today's Confessions</h1>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        {currentDate} · {confessions.length} entries
+                    </p>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button
+                            onClick={() => setSortBy('trending')}
+                            className={`btn-secondary ${sortBy === 'trending' ? 'active' : ''}`}
+                            style={{ fontSize: '0.65rem', padding: '0.3rem 0.6rem', background: sortBy === 'trending' ? 'var(--purple-neon)' : '' }}
+                        >
+                            🔥 Trending
+                        </button>
+                        <button
+                            onClick={() => setSortBy('recent')}
+                            className={`btn-secondary ${sortBy === 'recent' ? 'active' : ''}`}
+                            style={{ fontSize: '0.65rem', padding: '0.3rem 0.6rem', background: sortBy === 'recent' ? 'var(--purple-neon)' : '' }}
+                        >
+                            🕐 Recent
+                        </button>
+                    </div>
+                </div>
             </header>
 
             {loading ? (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '5rem 0', gap: '1rem' }}>
-                    <div className="vault-spinner" />
-                    <span className="text-label">Retrieving sealed confessions...</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                    {[1, 2, 3].map(i => (
+                        <div key={i} className="skeleton-card" style={{ height: '240px' }} />
+                    ))}
                 </div>
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    {confessions.length === 0 ? (
-                        <div className="empty-state stagger-enter stagger-2">
-                            <p>"In the silence before the first confession,<br />even the walls hold their breath."</p>
+                    {sortedConfessions.length === 0 ? (
+                        <div className="empty-state" style={{ textAlign: 'center', padding: '4rem 0' }}>
+                            <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic', marginBottom: '1.5rem' }}>
+                                No confessions yet today. Be the first to confess. 🤫
+                            </p>
+                            <a href="#" onClick={(e) => { e.preventDefault(); window.dispatchEvent(new CustomEvent('nav-submit')); }} className="btn-primary">
+                                Submit a Confession
+                            </a>
                         </div>
                     ) : (
-                        confessions.map((c, i) => (
-                            <div key={c.id} className={`stagger-enter stagger-${Math.min(i + 2, 8)}`}>
-                                <ConfessionCard
-                                    confession={c}
-                                    onVote={(type) => handleVote(c.id, type)}
-                                    onBet={(isReal, amount) => handleBet(c.id, isReal, amount)}
-                                    isOwner={myConfessions.includes(c.id)}
-                                />
-                            </div>
+                        sortedConfessions.map((c, i) => (
+                            <ConfessionCard
+                                key={c.id}
+                                confession={c}
+                                onVote={(type) => handleVote(c.id, type)}
+                                onBet={(isReal, amount) => handleBet(c.id, isReal, amount)}
+                                isOwner={myConfessions.includes(c.id)}
+                            />
                         ))
                     )}
                 </div>
@@ -92,3 +136,4 @@ export const Feed: React.FC = () => {
         </div>
     );
 };
+
