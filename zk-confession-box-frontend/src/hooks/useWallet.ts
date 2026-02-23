@@ -98,6 +98,11 @@ export function useWallet() {
     connect,
     disconnect,
     getContractSigner,
+
+    // Dev methods for WalletSwitcher compatibility
+    connectDev: async (player: number) => { console.log('Dev connect to player', player); },
+    switchPlayer: async (player: number) => { console.log('Dev switch to player', player); },
+    getCurrentDevPlayer: () => 1,
   };
 }
 
