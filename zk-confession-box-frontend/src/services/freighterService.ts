@@ -75,13 +75,28 @@ export class FreighterService {
                         networkPassphrase: opts?.networkPassphrase,
                     });
 
-                    const signedTxXdr = (typeof result === 'string') ? result : (result as any).signedTxXdr;
+                    console.log('[Freighter] signTransaction raw result:', JSON.stringify(result, null, 2));
+
+                    // Freighter v6 returns { signedTxXdr: string, signerAddress: string }
+                    // But some versions may return just a string
+                    let signedTxXdr: string | undefined;
+                    let signerAddress: string | undefined;
+
+                    if (typeof result === 'string') {
+                        signedTxXdr = result;
+                    } else if (result && typeof result === 'object') {
+                        signedTxXdr = (result as any).signedTxXdr || (result as any).xdr || (result as any).signedXdr;
+                        signerAddress = (result as any).signerAddress;
+                    }
 
                     if (!signedTxXdr) {
+                        console.error('[Freighter] No signedTxXdr found in result:', result);
                         throw new Error('Failed to get signed transaction XDR from Freighter');
                     }
 
-                    const signerAddress = await self.getPublicKey();
+                    if (!signerAddress) {
+                        signerAddress = (await self.getPublicKey()) || undefined;
+                    }
                     if (!signerAddress) throw new Error('Could not verify signer address');
 
                     return {
@@ -91,13 +106,13 @@ export class FreighterService {
                 } catch (error) {
                     console.error('[Freighter] signTransaction error:', error);
                     const message = error instanceof Error ? error.message : 'Failed to sign transaction';
-                    return {
-                        signedTxXdr: xdr,
-                        error: {
-                            message: message.includes('declined') ? 'Transaction signature declined by user.' : message,
-                            code: -1,
-                        },
-                    } as any;
+
+                    // If the user declined, throw so the caller knows
+                    if (message.includes('declined') || message.includes('cancel') || message.includes('reject')) {
+                        throw new Error('Transaction signature declined by user.');
+                    }
+
+                    throw error;
                 }
             },
 
