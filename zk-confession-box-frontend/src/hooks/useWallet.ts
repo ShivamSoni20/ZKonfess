@@ -11,6 +11,7 @@ export function useWallet() {
     isConnecting,
     network,
     networkPassphrase,
+    walletType,
     error,
     setWallet,
     setConnecting,
@@ -90,6 +91,7 @@ export function useWallet() {
     isConnecting,
     network,
     networkPassphrase,
+    walletType,
     error,
 
     // Actions

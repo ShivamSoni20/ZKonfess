@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "setup": "bun run scripts/setup.ts",
-    "build": "bun run scripts/build.ts && cd zk-confession-box-frontend && bun run build",
+    "build": "bun run scripts/build.ts && cd zk-confession-box-frontend && bun install && bun run build",
     "deploy": "bun run scripts/deploy.ts",
     "bindings": "bun run scripts/bindings.ts",
     "create": "bun run scripts/create.ts",
