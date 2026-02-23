@@ -27,6 +27,10 @@ console.log("🔨 Building Soroban contracts...\n");
 try {
   await $`stellar --version`.quiet();
 } catch (error) {
+  if (process.env.VERCEL === "1") {
+    console.log("🚀 Vercel detected. Skipping contract build because stellar CLI is missing (using pre-built or existing contracts).");
+    process.exit(0);
+  }
   console.error("❌ Error: stellar CLI not found");
   console.error("Please install it: https://developers.stellar.org/docs/tools/developer-tools");
   process.exit(1);
