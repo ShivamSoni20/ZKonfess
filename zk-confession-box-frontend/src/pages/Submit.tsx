@@ -86,7 +86,7 @@ export const Submit: React.FC = () => {
                         Only you can ever prove you wrote this.
                     </p>
                     <div style={{ display: 'flex', gap: '1rem' }}>
-                        <button onClick={() => window.location.reload()} className="btn-primary" style={{ flex: 1 }}>
+                        <button onClick={() => { setStatus(''); setContent(''); }} className="btn-primary" style={{ flex: 1 }}>
                             Submit Another
                         </button>
                     </div>
