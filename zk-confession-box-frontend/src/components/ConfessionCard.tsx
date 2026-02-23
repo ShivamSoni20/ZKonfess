@@ -154,14 +154,41 @@ export const ConfessionCard: React.FC<ConfessionCardProps> = ({
                 <button
                     onClick={() => setShowBetModal(true)}
                     disabled={confession.revealed}
-                    className="btn-secondary"
-                    style={{ flex: 1, borderColor: 'var(--purple-light)', borderStyle: 'solid' }}
+                    style={{
+                        flex: 1,
+                        padding: '0.6rem 1rem',
+                        background: 'transparent',
+                        border: '1px solid rgba(139, 92, 246, 0.4)',
+                        borderRadius: '6px',
+                        color: 'var(--text-primary)',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        letterSpacing: '0.1em',
+                        textTransform: 'uppercase' as const,
+                        cursor: confession.revealed ? 'not-allowed' : 'pointer',
+                        opacity: confession.revealed ? 0.4 : 1,
+                        transition: 'all 0.2s ease',
+                    }}
                 >
                     {confession.revealed ? 'Bets Sealed' : 'Place Bet'}
                 </button>
 
                 {isOwner && !confession.revealed && (
-                    <button onClick={onReveal} className="btn-ghost" style={{ fontSize: '0.7rem', color: 'var(--teal)' }}>
+                    <button
+                        onClick={onReveal}
+                        style={{
+                            padding: '0.6rem 1rem',
+                            background: 'rgba(61, 140, 126, 0.15)',
+                            border: '1px solid rgba(61, 140, 126, 0.5)',
+                            borderRadius: '6px',
+                            color: '#5de0c2',
+                            fontSize: '0.7rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            whiteSpace: 'nowrap' as const,
+                        }}
+                    >
                         🔓 Reveal Authorship
                     </button>
                 )}
