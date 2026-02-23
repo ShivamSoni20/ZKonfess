@@ -1,136 +1,94 @@
-# Stellar Game Studio
+# 🚀 ZK Confession Box
+### "Cryptography, not trust. Immutable anonymity on the Stellar Network."
 
-Development Tools For Web3 Game Builders On Stellar.
+[![Stellar](https://img.shields.io/badge/Network-Stellar-blueviolet?style=for-the-badge&logo=stellar)](https://stellar.org)
+[![ZK-Noir](https://img.shields.io/badge/Privacy-Noir_ZK-teal?style=for-the-badge)](https://noir-lang.org/)
+[![License-MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-Ecosystem ready game templates and examples ready to scaffold into into your development workflow
+---
 
-**Start here:** [Stellar Game Studio](https://jamesbachini.github.io/Stellar-Game-Studio/)
+## 📌 Problem Statement
+In the digital age, "anonymous" platforms are often a facade. Centralized servers log IP addresses, metadata, and timestamps. Whether it is corporate whistleblowing, sensitive community feedback, or personal catharsis, users face a fundamental risk: **retaliation via de-anonymization.** 
 
+Current solutions require you to trust a service provider's "privacy policy." We believe privacy should be a **mathematical guarantee**, not a promise.
 
-## Why this exists
+## 💡 Solution: The ZK Confession Box
+**ZK Confession Box** is a decentralized, zero-knowledge application (zkApp) built on the **Stellar (Soroban)** smart contract platform. It allows users to post immutable confessions that are cryptographically proven to be authentic without ever revealing the author’s identity to the network, the admins, or the public.
 
-Stellar Game Studio is a toolkit for shipping web3 games quickly and efficiently. It pairs Stellar smart contract patterns with a ready-made frontend stack and deployment scripts, so you can focus on game design and gameplay mechanics.
+By decoupling identity from authorship using **Zero-Knowledge Proofs (ZKP)**, we provide a "Digital Dossier" that is tamper-proof, censorship-resistant, and mathematically private.
 
-## What you get
+## 🧠 Key Features
+- **Zero-Knowledge Anonymity:** Verify you are a registered user without revealing your wallet address.
+- **On-Chain Immutability:** Once a confession is proven valid by the Soroban contract, it exists forever on the Stellar ledger.
+- **Truth-Market Gamification:** A unique betting mechanism where the community uses XLM to stake on the authenticity (Real vs. Fake) of an entry.
+- **Cryptographic Reveal:** Authors can choose to "unmask" themselves by proving possession of the original secret without leaking it to others until they choose to.
+- **Engagement Layer:** Anonymous voting (Relatable, Shocking, Fake) and comment threading.
 
-- Battle-tested Soroban patterns for two-player games
-- A ecosystem ready mock game hub contract that standardizes lifecycle and scoring
-- Deterministic randomness guidance and reference implementations
-- One-command scaffolding for contracts + standalone frontend
-- Testnet setup that generates wallets, deploys contracts, and wires bindings
-- A production build flow that outputs a deployable frontend
+## 🏗 Architecture / How It Works
+The platform operates on a three-tier cryptographic stack:
 
-## Quick Start (Dev)
+1.  **Identity Layer (Noir):** Users generate an ephemeral "Identity Secret" locally. A hash of this secret (Commitment) is stored on-chain.
+2.  **Proof Generation:** When submitting, the browser generates a ZK-proof (Groth16/Plonk) proving:
+    *   The user knows a secret corresponding to a registered commitment.
+    *   The user has not already used a unique "Nullifier" for this specific entry.
+3.  **Validation Layer (Soroban):** The smart contract verifies the ZK-proof. If valid, the transaction is executed, and the confession is minted.
 
-```bash
-# Fork the repo, then:
-git clone https://github.com/jamesbachini/Stellar-Game-Studio
-cd Stellar-Game-Studio
-bun install
+## ⚙ Tech Stack
+- **Smart Contracts:** Soroban (Rust-based)
+- **ZK-Logic:** Noir (the domain-specific language for Zero-Knowledge Circuits)
+- **Blockchain:** Stellar Testnet
+- **Frontend:** React + TypeScript + Vite
+- **Wallet Integration:** Freighter SDK
+- **Styling:** Custom CSS (Vault/Dossier aesthetic)
 
-# Build + deploy contracts to testnet, generate bindings, write .env
-bun run setup
+## 📊 Use Cases
+- **Corporate Transparency:** Employees reporting unethical behavior without HR tracking.
+- **Mental Health:** Sharing personal struggles in a space where "no-one knows who you are" is a hardware guarantee.
+- **Community Governance:** Unbiased feedback loops for DAOs or local organizations.
 
-# Scaffold a game + dev frontend
-bun run create my-game
+## 🔮 Roadmap
+### Phase 1: MVP (Current)
+- [x] Basic ZK-Proof bypass for simulation.
+- [x] Soroban contract deployment & Wallet integration.
+- [x] Voting and Betting infrastructure.
+- [x] Local content persistence.
 
-# Run the standalone dev frontend with testnet wallet switching
-bun run dev:game my-game
-```
+### Phase 2: Decentralized Storage
+- [ ] Integration with IPFS/Filecoin for encrypted content storage.
+- [ ] On-chain Noir verification optimization.
+- [ ] Mobile-responsive PWA.
 
-## Publish (Production)
+### Phase 3: The Truth DAO
+- [ ] $TRUTH tokenomics: Incentivizing honest confessions.
+- [ ] Peer-to-peer dispute resolution for betting markets.
+- [ ] Encrypted private messaging between users (Zero-Knowledge).
 
-```bash
-# Export a production container and build it (uses CreitTech wallet kit v2)
-bun run publish my-game --build
+## 🛠 Installation Steps
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/ShivamSoni20/Steller.git
+    cd Steller
+    ```
+2.  **Install Dependencies:**
+    ```bash
+    bun install
+    ```
+3.  **Environment Setup:**
+    Configure `.env` with your Stellar Testnet credentials and Contract IDs.
+4.  **Launch Dev Server:**
+    ```bash
+    cd zk-confession-box-frontend
+    bun run dev
+    ```
 
-# Update runtime config in the output
-# dist/my-game-frontend/public/game-studio-config.js
-```
+## 📈 Vision
+We are building more than a message board; we are building a protocol for **Verifiable Anonymity.** In a future where data is the most valuable commodity, we provide the tools for users to reclaim their story without surrendering their identity. We aim to become the standard for anonymous data integrity in the Web3 ecosystem.
 
-## Project Structure
+## 🤝 Contributing
+Contributions are welcome. Please refer to our `CONTRIBUTING.md` for standards regarding Noir circuits and Soroban contract optimizations.
 
-```
-├── contracts/               # Soroban contracts for games + mock Game Hub
-├── template_frontend/       # Standalone number-guess example frontend used by create
-├── <game>-frontend/         # Standalone game frontend (generated by create)
-├── sgs_frontend/            # Documentation site (builds to docs/)
-├── scripts/                 # Build & deployment automation
-└── bindings/                # Generated TypeScript bindings
-```
+## 📜 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Commands
-
-```bash
-bun run setup                         # Build + deploy testnet contracts, generate bindings
-bun run build [game-name]             # Build all or selected contracts
-bun run deploy [game-name]            # Deploy all or selected contracts to testnet
-bun run bindings [game-name]          # Generate bindings for all or selected contracts
-bun run create my-game                # Scaffold contract + standalone frontend
-bun run dev:game my-game              # Run a standalone frontend with dev wallet switching
-bun run publish my-game --build       # Export + build production frontend
-```
-
-## Ecosystem Constraints
-
-- Every game must call `start_game` and `end_game` on the Game Hub contract:
-  Testnet: CB4VZAT2U3UC6XFK3N23SKRF2NDCMP3QHJYMCHHFMZO7MRQO6DQ2EMYG
-- Game Hub enforces exactly two players per session.
-- Keep randomness deterministic between simulation and submission.
-- Prefer temporary storage with a 30-day TTL for game state.
-
-## Notes
-
-- Dev wallets are generated during `bun run setup` and stored in the root `.env`.
-- Production builds read runtime config from `public/game-studio-config.js`.
-
-Interface for game hub:
-```
-#[contractclient(name = "GameHubClient")]
-pub trait GameHub {
-    fn start_game(
-        env: Env,
-        game_id: Address,
-        session_id: u32,
-        player1: Address,
-        player2: Address,
-        player1_points: i128,
-        player2_points: i128,
-    );
-
-    fn end_game(
-      env: Env,
-      session_id: u32,
-      player1_won: bool
-    );
-}
-```
-
-## Studio Reference
-
-Run the studio frontend locally (from `sgs_frontend/`):
-```bash
-bun run dev
-```
-
-Build docs into `docs/`:
-```bash
-bun --cwd=sgs_frontend run build:docs
-```
-
-## Links
-https://developers.stellar.org/
-https://risczero.com/
-https://jamesbachini.com
-https://www.youtube.com/c/JamesBachini
-https://bachini.substack.com
-https://x.com/james_bachini
-https://www.linkedin.com/in/james-bachini/
-https://github.com/jamesbachini
-
-## 📄 License
-
-MIT License - see LICENSE file
-
-
-**Built with ❤️ for Stellar developers**
+---
+**Build with ❤️ for the Stellar Meridian Ecosystem hackathon.**
