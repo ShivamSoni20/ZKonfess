@@ -1,4 +1,4 @@
-# Zk Confession Box Game
+# ZKonfess Smart Contract
 
 A simple two-player guessing game smart contract built on Stellar's Soroban platform.
 

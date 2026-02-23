@@ -1,4 +1,4 @@
-# 🚀 ZK Confession Box
+# 🚀 ZKonfess
 ### "Cryptography, not trust. Immutable anonymity on the Stellar Network."
 
 [![Stellar](https://img.shields.io/badge/Network-Stellar-blueviolet?style=for-the-badge&logo=stellar)](https://stellar.org)
@@ -12,8 +12,8 @@ In the digital age, "anonymous" platforms are often a facade. Centralized server
 
 Current solutions require you to trust a service provider's "privacy policy." We believe privacy should be a **mathematical guarantee**, not a promise.
 
-## 💡 Solution: The ZK Confession Box
-**ZK Confession Box** is a decentralized, zero-knowledge application (zkApp) built on the **Stellar (Soroban)** smart contract platform. It allows users to post immutable confessions that are cryptographically proven to be authentic without ever revealing the author’s identity to the network, the admins, or the public.
+## 💡 Solution: ZKonfess
+**ZKonfess** is a decentralized, zero-knowledge application (zkApp) built on the **Stellar (Soroban)** smart contract platform. It allows users to post immutable confessions that are cryptographically proven to be authentic without ever revealing the author’s identity to the network, the admins, or the public.
 
 By decoupling identity from authorship using **Zero-Knowledge Proofs (ZKP)**, we provide a "Digital Dossier" that is tamper-proof, censorship-resistant, and mathematically private.
 
@@ -26,6 +26,20 @@ By decoupling identity from authorship using **Zero-Knowledge Proofs (ZKP)**, we
 
 ## 🏗 Architecture / How It Works
 The platform operates on a three-tier cryptographic stack:
+
+```mermaid
+graph TD
+    User((User/Client)) -->|1. Generate Secret| ZKRuntime[Noir WASM Runtime]
+    ZKRuntime -->|2. Identity Commitment| Stellar[(Stellar Soroban)]
+    User -->|3. Write Confession| ZKRuntime
+    ZKRuntime -->|4. Generate Proof| User
+    User -->|5. Submit Proof + Hash| Stellar
+    Stellar -->|6. Verify & Store| Ledger{On-Chain Ledger}
+    User -->|7. Store Content| Supabase[(Supabase/IPFS)]
+    Public((Public Feed)) -->|8. Fetch ID & Proof| Stellar
+    Public -->|9. Fetch Text| Supabase
+    Public -->|10. Verify Integrity| Public
+```
 
 1.  **Identity Layer (Noir):** Users generate an ephemeral "Identity Secret" locally. A hash of this secret (Commitment) is stored on-chain.
 2.  **Proof Generation:** When submitting, the browser generates a ZK-proof (Groth16/Plonk) proving:

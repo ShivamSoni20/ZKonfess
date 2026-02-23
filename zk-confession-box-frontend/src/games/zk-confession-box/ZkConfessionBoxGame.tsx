@@ -153,7 +153,7 @@ export function ZkConfessionBoxGame({
       if (game && game.winner !== null && game.winner !== undefined) {
         setGamePhase('complete');
       } else if (game && game.player1_guess !== null && game.player1_guess !== undefined &&
-                 game.player2_guess !== null && game.player2_guess !== undefined) {
+        game.player2_guess !== null && game.player2_guess !== undefined) {
         setGamePhase('reveal');
       } else {
         setGamePhase('guess');
@@ -725,7 +725,7 @@ export function ZkConfessionBoxGame({
           const isWinner = game.winner === userAddress;
           setSuccess(isWinner ? '🎉 You won this game!' : 'Game complete. Winner revealed.');
         } else if (game.player1_guess !== null && game.player1_guess !== undefined &&
-            game.player2_guess !== null && game.player2_guess !== undefined) {
+          game.player2_guess !== null && game.player2_guess !== undefined) {
           // Both players guessed, waiting for reveal
           setGamePhase('reveal');
           setSuccess('Game loaded! Both players have guessed. You can reveal the winner.');
@@ -866,7 +866,7 @@ export function ZkConfessionBoxGame({
   const isPlayer1 = gameState && gameState.player1 === userAddress;
   const isPlayer2 = gameState && gameState.player2 === userAddress;
   const hasGuessed = isPlayer1 ? gameState?.player1_guess !== null && gameState?.player1_guess !== undefined :
-                     isPlayer2 ? gameState?.player2_guess !== null && gameState?.player2_guess !== undefined : false;
+    isPlayer2 ? gameState?.player2_guess !== null && gameState?.player2_guess !== undefined : false;
 
   const winningNumber = gameState?.winning_number;
   const player1Guess = gameState?.player1_guess;
@@ -885,7 +885,7 @@ export function ZkConfessionBoxGame({
       <div className="flex items-center mb-6">
         <div>
           <h2 className="text-3xl font-black bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 bg-clip-text text-transparent">
-            Zk Confession Box Game 🎲
+            ZKonfess Game 🎲
           </h2>
           <p className="text-sm text-gray-700 font-semibold mt-1">
             Guess a number 1-10. Closest guess wins!
@@ -924,11 +924,10 @@ export function ZkConfessionBoxGame({
                 setImportPlayer2Points(DEFAULT_POINTS);
                 setLoadSessionId('');
               }}
-              className={`flex-1 py-3 px-4 rounded-lg font-bold text-sm transition-all ${
-                createMode === 'create'
+              className={`flex-1 py-3 px-4 rounded-lg font-bold text-sm transition-all ${createMode === 'create'
                   ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
                   : 'bg-white text-gray-600 hover:bg-gray-50'
-              }`}
+                }`}
             >
               Create & Export
             </button>
@@ -938,11 +937,10 @@ export function ZkConfessionBoxGame({
                 setExportedAuthEntryXDR(null);
                 setLoadSessionId('');
               }}
-              className={`flex-1 py-3 px-4 rounded-lg font-bold text-sm transition-all ${
-                createMode === 'import'
+              className={`flex-1 py-3 px-4 rounded-lg font-bold text-sm transition-all ${createMode === 'import'
                   ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg'
                   : 'bg-white text-gray-600 hover:bg-gray-50'
-              }`}
+                }`}
             >
               Import Auth Entry
             </button>
@@ -956,11 +954,10 @@ export function ZkConfessionBoxGame({
                 setImportPlayer1Points('');
                 setImportPlayer2Points(DEFAULT_POINTS);
               }}
-              className={`flex-1 py-3 px-4 rounded-lg font-bold text-sm transition-all ${
-                createMode === 'load'
+              className={`flex-1 py-3 px-4 rounded-lg font-bold text-sm transition-all ${createMode === 'load'
                   ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg'
                   : 'bg-white text-gray-600 hover:bg-gray-50'
-              }`}
+                }`}
             >
               Load Existing Game
             </button>
@@ -986,91 +983,91 @@ export function ZkConfessionBoxGame({
 
           {createMode === 'create' ? (
             <div className="space-y-6">
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
-                Your Address (Player 1)
-              </label>
-              <input
-                type="text"
-                value={player1Address}
-                onChange={(e) => setPlayer1Address(e.target.value.trim())}
-                placeholder="G..."
-                className="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-200 focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 text-sm font-medium text-gray-700"
-              />
-              <p className="text-xs font-semibold text-gray-600 mt-1">
-                Pre-filled from your connected wallet. If you change it, you must be able to sign as that address.
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
-                Your Points
-              </label>
-              <input
-                type="text"
-                value={player1Points}
-                onChange={(e) => setPlayer1Points(e.target.value)}
-                placeholder="0.1"
-                className="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-200 focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 text-sm font-medium"
-              />
-              <p className="text-xs font-semibold text-gray-600 mt-1">
-                Available: {(Number(availablePoints) / 10000000).toFixed(2)} Points
-              </p>
-            </div>
-
-            <div className="p-3 bg-blue-50 border-2 border-blue-200 rounded-xl">
-              <p className="text-xs font-semibold text-blue-800">
-                ℹ️ Player 2 will specify their own address and points when they import your auth entry. You only need to prepare and export your signature.
-              </p>
-            </div>
-          </div>
-
-          <div className="pt-4 border-t-2 border-gray-100 space-y-4">
-            <p className="text-xs font-semibold text-gray-600">
-              Session ID: {sessionId}
-            </p>
-
-            {!exportedAuthEntryXDR ? (
-              <button
-                onClick={handlePrepareTransaction}
-                disabled={isBusy}
-                className="w-full py-4 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:from-gray-200 disabled:to-gray-300 disabled:text-gray-500 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
-              >
-                {loading ? 'Preparing...' : 'Prepare & Export Auth Entry'}
-              </button>
-            ) : (
-              <div className="space-y-3">
-                <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl">
-                  <p className="text-xs font-bold uppercase tracking-wide text-green-700 mb-2">
-                    Auth Entry XDR (Player 1 Signed)
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Your Address (Player 1)
+                  </label>
+                  <input
+                    type="text"
+                    value={player1Address}
+                    onChange={(e) => setPlayer1Address(e.target.value.trim())}
+                    placeholder="G..."
+                    className="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-200 focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 text-sm font-medium text-gray-700"
+                  />
+                  <p className="text-xs font-semibold text-gray-600 mt-1">
+                    Pre-filled from your connected wallet. If you change it, you must be able to sign as that address.
                   </p>
-                  <div className="bg-white p-3 rounded-lg border border-green-200 mb-3">
-                    <code className="text-xs font-mono text-gray-700 break-all">
-                      {exportedAuthEntryXDR}
-                    </code>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <button
-                      onClick={copyAuthEntryToClipboard}
-                      className="py-3 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg transform hover:scale-105"
-                    >
-                      {authEntryCopied ? '✓ Copied!' : '📋 Copy Auth Entry'}
-                    </button>
-                    <button
-                      onClick={copyShareGameUrlWithAuthEntry}
-                      className="py-3 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg transform hover:scale-105"
-                    >
-                      {shareUrlCopied ? '✓ Copied!' : '🔗 Share URL'}
-                    </button>
-                  </div>
                 </div>
-                <p className="text-xs text-gray-600 text-center font-semibold">
-                  Copy the auth entry XDR or share URL with Player 2 to complete the transaction
-                </p>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Your Points
+                  </label>
+                  <input
+                    type="text"
+                    value={player1Points}
+                    onChange={(e) => setPlayer1Points(e.target.value)}
+                    placeholder="0.1"
+                    className="w-full px-4 py-3 rounded-xl bg-white border-2 border-gray-200 focus:outline-none focus:border-purple-400 focus:ring-4 focus:ring-purple-100 text-sm font-medium"
+                  />
+                  <p className="text-xs font-semibold text-gray-600 mt-1">
+                    Available: {(Number(availablePoints) / 10000000).toFixed(2)} Points
+                  </p>
+                </div>
+
+                <div className="p-3 bg-blue-50 border-2 border-blue-200 rounded-xl">
+                  <p className="text-xs font-semibold text-blue-800">
+                    ℹ️ Player 2 will specify their own address and points when they import your auth entry. You only need to prepare and export your signature.
+                  </p>
+                </div>
               </div>
-            )}
-          </div>
+
+              <div className="pt-4 border-t-2 border-gray-100 space-y-4">
+                <p className="text-xs font-semibold text-gray-600">
+                  Session ID: {sessionId}
+                </p>
+
+                {!exportedAuthEntryXDR ? (
+                  <button
+                    onClick={handlePrepareTransaction}
+                    disabled={isBusy}
+                    className="w-full py-4 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:from-gray-200 disabled:to-gray-300 disabled:text-gray-500 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
+                  >
+                    {loading ? 'Preparing...' : 'Prepare & Export Auth Entry'}
+                  </button>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl">
+                      <p className="text-xs font-bold uppercase tracking-wide text-green-700 mb-2">
+                        Auth Entry XDR (Player 1 Signed)
+                      </p>
+                      <div className="bg-white p-3 rounded-lg border border-green-200 mb-3">
+                        <code className="text-xs font-mono text-gray-700 break-all">
+                          {exportedAuthEntryXDR}
+                        </code>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button
+                          onClick={copyAuthEntryToClipboard}
+                          className="py-3 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg transform hover:scale-105"
+                        >
+                          {authEntryCopied ? '✓ Copied!' : '📋 Copy Auth Entry'}
+                        </button>
+                        <button
+                          onClick={copyShareGameUrlWithAuthEntry}
+                          className="py-3 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg transform hover:scale-105"
+                        >
+                          {shareUrlCopied ? '✓ Copied!' : '🔗 Share URL'}
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-600 text-center font-semibold">
+                      Copy the auth entry XDR or share URL with Player 2 to complete the transaction
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           ) : createMode === 'import' ? (
             /* IMPORT MODE */
@@ -1101,13 +1098,12 @@ export function ZkConfessionBoxGame({
                       onChange={(e) => setImportAuthEntryXDR(e.target.value)}
                       placeholder="Paste Player 1's signed auth entry XDR here..."
                       rows={4}
-                      className={`w-full px-4 py-3 rounded-xl bg-white border-2 focus:outline-none focus:ring-4 text-xs font-mono resize-none transition-colors ${
-                        xdrParseError
+                      className={`w-full px-4 py-3 rounded-xl bg-white border-2 focus:outline-none focus:ring-4 text-xs font-mono resize-none transition-colors ${xdrParseError
                           ? 'border-red-300 focus:border-red-400 focus:ring-red-100'
                           : xdrParseSuccess
-                          ? 'border-green-300 focus:border-green-400 focus:ring-green-100'
-                          : 'border-blue-200 focus:border-blue-400 focus:ring-blue-100'
-                      }`}
+                            ? 'border-green-300 focus:border-green-400 focus:ring-green-100'
+                            : 'border-blue-200 focus:border-blue-400 focus:ring-blue-100'
+                        }`}
                     />
                     {xdrParseError && (
                       <p className="text-xs text-red-600 font-semibold mt-1">
@@ -1292,11 +1288,10 @@ export function ZkConfessionBoxGame({
                   <button
                     key={num}
                     onClick={() => setGuess(num)}
-                    className={`p-4 rounded-xl border-2 font-black text-xl transition-all ${
-                      guess === num
+                    className={`p-4 rounded-xl border-2 font-black text-xl transition-all ${guess === num
                         ? 'border-purple-500 bg-gradient-to-br from-purple-500 to-pink-500 text-white scale-110 shadow-2xl'
                         : 'border-gray-200 bg-white hover:border-purple-300 hover:shadow-lg hover:scale-105'
-                    }`}
+                      }`}
                   >
                     {num}
                   </button>

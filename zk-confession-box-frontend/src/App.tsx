@@ -36,7 +36,7 @@ function ConnectModal({ onClose }: { onClose: () => void }) {
             Secure Connection
           </h2>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-            Connect your Freighter wallet to interact with the ZK Confession Box.
+            Connect your Freighter wallet to interact with ZKonfess.
           </p>
         </div>
 
@@ -130,7 +130,7 @@ function AppContent() {
       <nav className="vault-nav">
         <div className="vault-nav-inner">
           <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
-            <span className="vault-logo">🤫 ZK Confession Box</span>
+            <span className="vault-logo">🤫 ZKonfess</span>
 
             <div className="vault-tabs desktop-tabs">
               {(Object.keys(TAB_LABELS) as Tab[]).map((tab) => (
